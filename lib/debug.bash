@@ -1,5 +1,22 @@
 #!/usr/bin/env false
 
+shopt -s extglob
+
+function _get_cpos {
+  IFS=';' read -sdR -p $'\033[6n' CROW CCOL
+  CROW="${CROW#*\[}"
+}
+function _file_context_debug {
+  awk \
+    -v lower=$1 \
+    -v upper=$2 \
+    -v line=$3 \
+    '
+  FNR >= lower && FNR < line { print " \033[34m│\033[34m "   FNR" \033[0m "        $0"\033[0m\033[0K" }
+  FNR == line                { print " \033[34m└\033[30;44m "FNR" \033[0m \033[34m"$0"\033[0m\033[0K" }
+  FNR <= upper && FNR > line { print "  \033[34m "           FNR" \033[0m "        $0"\033[0m\033[0K" }
+  ' "$4"
+}
 function _debug {
   [[ $BASH_COMMAND =~ trap\ -|_debug\ DEBUG ]] && return 0
   local size=${#BASH_SOURCE[@]} contextLines=3 currentLine= currentFile= orow= cmdlines=$(cat $_dbg_log | wc -l)

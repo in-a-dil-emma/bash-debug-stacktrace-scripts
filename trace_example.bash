@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-source ./lib/basic.bash
 source ./lib/trace.bash
 
 function nest {
